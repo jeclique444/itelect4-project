@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    // File Layout - UNCOMMENT THESE
+    "rootDir": ".",
+    "outDir": "./dist",
+
+    // Environment Settings - CHANGE THESE
+    "module": "commonjs",
+    "target": "ES2020",
+    
+    // For Node.js - ADD THIS LINE
+    "types": ["node"],
+    
+    // Remove or comment out these (not needed for basic project)
+    // "sourceMap": true,
+    // "declaration": true,
+    // "declarationMap": true,
+
+    // Stricter Typechecking Options - COMMENT OUT THESE (optional for now)
+    // "noUncheckedIndexedAccess": true,
+    // "exactOptionalPropertyTypes": true,
+
+    // Style Options - COMMENT OUT ALL (or leave as is)
+    // "noImplicitReturns": true,
+    // "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+
+    // Recommended Options - MODIFY THESE
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+    
+    // Remove or comment out these (not needed)
+    // "jsx": "react-jsx",
+    // "verbatimModuleSyntax": true,
+    // "isolatedModules": true,
+    // "noUncheckedSideEffectImports": true,
+    // "moduleDetection": "force"
+  },
+  // ADD THESE TWO LINES BELOW - FIXED PATHS
+  "include": ["src/**/*", "types/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
