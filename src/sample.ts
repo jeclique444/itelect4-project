@@ -11,7 +11,7 @@ function getUser(id: number): User & { score: number } {
     id: id,
     name: "Juan dela Cruz",
     email: "juan@example.com",
-    role: "student",     // student lang muna kasi wala pang admin dito
+    role: "tutee",     // tutee ang mas accurate kasi ang student is general term
     isActive: true,      // active naman si user
     score: 95.5,         // mataas na score to ah
   };
