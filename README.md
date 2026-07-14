@@ -56,7 +56,44 @@ Generic interface for consistent API responses:
 ```typescript
 interface ApiResponse<T> {
   success: boolean;
-  data: T;                          //T is a placeholder that works with any data type.
+  data: T;                          // T is a placeholder that works with any data type.
   message?: string;
   timestamp?: Date;
 }
+```
+
+## Installation and Setup
+
+### Prerequisites
+- Node.js (v16 or higher)
+- npm (v8 or higher)
+
+### Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/jeclique444/itelect4-project.git
+   cd itelect4-project
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the application**
+   ```bash
+   npx ts-node src/index.ts
+   ```
+
+4. **Check for TypeScript errors**
+   ```bash
+   npx tsc --noEmit
+   ```
+
+## GT1 Part 2 Submission
+- **Tag**: `gt1`
+- **Repository**: https://github.com/jeclique444/itelect4-project
+
+## Author
+**Jeric Lique** - IT4C Student
