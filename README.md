@@ -1,99 +1,75 @@
-# ITELECT4 Project - Peer Tutoring Booking Platform
+# React + TypeScript + Vite
 
-## Project Concept
-A web application where students can book tutoring sessions from peer tutors. 
-Tutors create sessions, students book them, and both parties can track progress 
-through a complete booking lifecycle (requested → confirmed → completed).
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Core Features
-- Users can sign up as tutors or tutees
-- Tutors create and manage tutoring sessions
-- Students browse and book available sessions
-- Booking status tracking (requested, confirmed, completed, etc.)
-- Rating system for tutors after sessions
-- Dashboard for managing bookings and sessions
+Currently, two official plugins are available:
 
-## Entities Defined
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-### User
-Represents anyone using the platform (tutor, tutee, or admin)
-- `id`: string | number - Unique identifier
-- `name`: string - Full name
-- `email`: string - Email address
-- `role`: "tutor" | "tutee" | "admin" - User role
-- `isActive`: boolean - Account status
-- `rating?`: number - Optional tutor rating
-- `subjects?`: string[] - Optional subjects they can teach
+## React Compiler
 
-### Session
-Represents a tutoring session offered by a tutor
-- `id`: number - Unique identifier
-- `tutorId`: number - Reference to User (tutor)
-- `subject`: string - Subject being taught
-- `description`: string - Session details
-- `duration`: number - Duration in minutes
-- `capacity`: number - Max number of students
-- `schedule`: Date - When the session happens
-- `price`: number - Cost per session
-- `location`: string - Where it happens
-- `status`: "active" | "cancelled" | "full" - Session status
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-### Booking
-Represents a booking made by a tutee for a session
-- `id`: number - Unique identifier
-- `sessionId`: number - Reference to Session
-- `tuteeId`: number - Reference to User (tutee)
-- `status`: "requested" | "confirmed" | "waitlisted" | "completed" | "cancelled" - Booking lifecycle
-- `bookedAt`: Date - When booking was made
-- `attendedAt?`: Date - When they attended
-- `feedback?`: string - Feedback after session
-- `rating?`: number - Rating given
+## Expanding the ESLint configuration
 
-## Generic Types
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-### ApiResponse<T>
-Generic interface for consistent API responses:
-```typescript
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;                          // T is a placeholder that works with any data type.
-  message?: string;
-  timestamp?: Date;
-}
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
 ```
 
-## Installation and Setup
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-### Prerequisites
-- Node.js (v16 or higher)
-- npm (v8 or higher)
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-### Steps
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/jeclique444/itelect4-project.git
-   cd itelect4-project
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Run the application**
-   ```bash
-   npx ts-node src/index.ts
-   ```
-
-4. **Check for TypeScript errors**
-   ```bash
-   npx tsc --noEmit
-   ```
-
-## GT1 Part 2 Submission
-- **Tag**: `gt1`
-- **Repository**: https://github.com/jeclique444/itelect4-project
-
-## Author
-**Jeric Lique** - IT4C Student
+```
