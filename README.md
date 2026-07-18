@@ -1,75 +1,143 @@
-# React + TypeScript + Vite
+# ITELECT4 Project - Peer Tutoring Booking Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Concept
+A web application where students can book tutoring sessions from peer tutors. 
+Tutors create sessions, students book them, and both parties can track progress 
+through a complete booking lifecycle (requested → confirmed → completed).
 
-Currently, two official plugins are available:
+## Tech Stack
+- React 18
+- TypeScript
+- Vite
+- CSS (for styling)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## List of Interfaces/Types Defined
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+### User
+```typescript
+interface User {
+  id: string | number;       // Unique identifier
+  name: string;              // Full name
+  email: string;             // Email address
+  role: "tutor" | "tutee" | "admin";  // User role
+  isActive: boolean;         // Account status
+  rating?: number;           // Optional tutor rating
+  subjects?: string[];       // Optional subjects they can teach
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+### Session
+```typescript
+interface Session {
+  id: number;                // Unique identifier
+  tutorId: number;           // Reference to User (tutor)
+  subject: string;           // Subject being taught
+  description: string;       // Session details
+  duration: number;          // Duration in minutes
+  capacity: number;          // Max number of students
+  schedule: Date;            // When the session happens
+  price: number;             // Cost per session
+  location: string;          // Where it happens
+  status: "active" | "cancelled" | "full";  // Session status
+}
 ```
+
+### Booking
+```typescript
+interface Booking {
+  id: number;                // Unique identifier
+  sessionId: number;         // Reference to Session
+  tuteeId: number;           // Reference to User (tutee)
+  status: "requested" | "confirmed" | "waitlisted" | "completed" | "cancelled";
+  bookedAt: Date;            // When booking was made
+  attendedAt?: Date;         // When they attended
+  feedback?: string;         // Feedback after session
+  rating?: number;           // Rating given
+}
+```
+
+### Type Aliases
+```typescript
+type ID = number;                              // Unique identifier type
+type StringOrNumber = string | number;         // Flexible type
+type Status = "pending" | "active" | "inactive"; // Generic status
+type BookingStatus = "requested" | "confirmed" | "waitlisted" | "completed" | "cancelled";
+```
+
+### Utility Types
+```typescript
+type UserUpdate = Partial<User>;  // All fields optional for updates
+type UserPreview = Pick<User, "id" | "name" | "role" | "rating">;  // Selected fields
+type PublicUser = Omit<User, "email" | "isActive" | "subjects">;  // Excludes sensitive fields
+type RoleCount = Record<"tutor" | "tutee" | "admin", number>;  // Dashboard statistics
+```
+
+### Generic Interface
+```typescript
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;                          // T is a placeholder that works with any data type
+  message?: string;
+  timestamp?: Date;
+}
+```
+
+### Generic Functions
+```typescript
+function getFirst<T>(items: T[]): T | undefined
+function getById<T extends { id: number }>(items: T[], id: number): T | undefined
+function getItemsByStatus<T extends { status: string }>(items: T[], status: string): T[]
+function createApiResponse<T>(data: T, success?: boolean, message?: string): ApiResponse<T>
+```
+
+### Enums
+```typescript
+// Regular enum - supports reverse mapping
+enum BookingStatusEnum {
+  Requested = "requested",
+  Confirmed = "confirmed",
+  Waitlisted = "waitlisted",
+  Completed = "completed",
+  Cancelled = "cancelled"
+}
+
+// Const enum - inlined at compile time
+const enum UserRole {
+  Tutor = "tutor",
+  Tutee = "tutee",
+  Admin = "admin"
+}
+
+// Numeric enum - auto-incrementing values
+enum SessionStatus {
+  Active,      // 0
+  Cancelled,   // 1
+  Full         // 2
+}
+```
+
+## Installation and Setup
+
+### Prerequisites
+- Node.js (v16 or higher)
+- npm (v8 or higher)
+
+### Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/jeclique444/itelect4-project.git
+   cd itelect4-project
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run the application**
+   ```bash
+   npm run dev
+   ```
+
+
