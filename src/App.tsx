@@ -1,34 +1,15 @@
-/**
- * App.tsx - Main Application Component
- * 
- * This component:
- * 1. Imports all three typed components
- * 2. Creates mock data using GT1 interfaces
- * 3. Uses useState for state management
- * 4. Defines callback functions with typed parameters
- * 5. Renders all components with event handlers
- */
-
-// React useState hook for state management
-import { useState } from "react";
-
-// Import our typed components
+import { useState, useEffect, useRef } from "react";
+import type { User, Session, Booking } from "./types/index";
 import UserCard from "./components/UserCard";
 import SessionCard from "./components/SessionCard";
 import BookingCard from "./components/BookingCard";
-
-// Import types from our types folder
-import type { User, Session, Booking } from "./types/index";
+import useToggle from "./hooks/useToggle";
+import usePrevious from "./hooks/usePrevious";
 
 // ========================================
 // MOCK DATA
 // ========================================
 
-/**
- * Mock data created using the User interface
- * This simulates data from an API or database
- * All fields match the interface requirements
- */
 const tutor: User = {
   id: 1,
   name: "Jeric Lique",
@@ -55,11 +36,6 @@ const admin: User = {
   isActive: true
 };
 
-/**
- * Mock session data
- * Uses Session interface
- * Schedule is set to a future date
- */
 const session: Session = {
   id: 1,
   tutorId: 1,
@@ -67,17 +43,12 @@ const session: Session = {
   description: "Advanced Calculus tutoring session",
   duration: 60,
   capacity: 5,
-  schedule: new Date("2026-07-20T14:00:00"),
+  schedule: new Date("2026-07-25T14:00:00"),
   price: 500,
   location: "Library Room MB 301",
   status: "active"
 };
 
-/**
- * Mock booking data
- * Uses Booking interface
- * Initial status is "requested"
- */
 const booking: Booking = {
   id: 1,
   sessionId: 1,
@@ -86,132 +57,211 @@ const booking: Booking = {
   bookedAt: new Date()
 };
 
+// All users for the dropdown/selection
+const allUsers: User[] = [tutor, tutee, admin];
+const allSessions: Session[] = [session];
+const allBookings: Booking[] = [booking];
+
 // ========================================
 // APP COMPONENT
 // ========================================
 
-/**
- * App Component
- * The root component that renders everything
- * 
- * Uses useState for three pieces of state:
- * 1. selectedUser - tracks which user is selected
- * 2. selectedSession - tracks which session is selected
- * 3. bookings - array of bookings (can be updated)
- * 
- * Callback functions:
- * - handleSelectUser: Updates selectedUser when a user is selected
- * - handleBookSession: Shows alert and updates selectedSession
- * - handleCancelBooking: Updates booking status to "cancelled"
- */
 function App() {
-  // State declarations with explicit types
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
-  const [bookings, setBookings] = useState<Booking[]>([booking]);
+  // ===== useState<T> - Typed State =====
 
-  /**
-   * handleSelectUser - Typed callback for UserCard
-   * @param user - The selected User object
-   * 
-   * This function:
-   * 1. Updates the state with selected user
-   * 2. Logs to console for debugging
-   */
-  const handleSelectUser = (user: User) => {
-    setSelectedUser(user);
-    console.log("Selected user:", user.name);
+  // State for selected user - starts as null
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  // State for sessions list - starts empty
+  const [sessions, setSessions] = useState<Session[]>([]);
+
+  // State for bookings list - starts empty
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  // State for loading flag - starts true
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // State for search term - starts empty string
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  // ===== useRef - Typed DOM Reference =====
+
+  // Reference to the search input element
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // ===== Custom Hooks =====
+
+  // useToggle - for showing/hiding details
+  const [showDetails, toggleDetails] = useToggle(false);
+
+  // usePrevious - tracks previous search term
+  const previousSearch = usePrevious(searchTerm);
+
+  // ===== useEffect - Load Mock Data on Mount =====
+
+  // Runs once when component mounts (empty dependency array)
+  useEffect(() => {
+    // Simulate API call with setTimeout
+    const timer = setTimeout(() => {
+      setSessions(allSessions);
+      setBookings(allBookings);
+      setIsLoading(false);
+    }, 500); // 500ms delay to simulate loading
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timer);
+  }, []); // Empty array = run once on mount
+
+  // ===== Typed Event Handler =====
+
+  // React.ChangeEvent<HTMLInputElement> types the event
+  const handleSearchChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
+    setSearchTerm(e.target.value);
   };
 
-  /**
-   * handleBookSession - Typed callback for SessionCard
-   * @param session - The selected Session object
-   * 
-   * This function:
-   * 1. Updates the state with selected session
-   * 2. Shows an alert to confirm booking
-   * 3. Logs to console for debugging
-   */
+  // ===== Filtered Data =====
+
+  // Filter sessions based on search term
+  const filteredSessions = sessions.filter((s) =>
+    s.subject.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // ===== Handlers for Components =====
+
+  const handleSelectUser = (user: User) => {
+    setSelectedUser(user);
+  };
+
   const handleBookSession = (session: Session) => {
-    setSelectedSession(session);
-    console.log("Booking session:", session.subject);
     alert(`Booking session: ${session.subject} at ${session.location}`);
   };
 
-  /**
-   * handleCancelBooking - Typed callback for BookingCard
-   * @param booking - The Booking to cancel
-   * 
-   * This function:
-   * 1. Creates a new array with the booking status changed to "cancelled"
-   * 2. Updates the bookings state
-   * 3. Shows an alert to confirm cancellation
-   * 4. Logs to console for debugging
-   * 
-   * Uses array.map() to create a new array (immutable update)
-   * The 'as const' assertion ensures TypeScript treats it as a literal
-   */
   const handleCancelBooking = (booking: Booking) => {
     const updatedBookings = bookings.map((b) =>
       b.id === booking.id ? { ...b, status: "cancelled" as const } : b
     );
     setBookings(updatedBookings);
-    console.log("Cancelled booking:", booking.id);
     alert(`Booking #${booking.id} cancelled!`);
   };
 
-  /**
-   * JSX Return
-   * 
-   * The component renders:
-   * 1. Header with app title
-   * 2. UserCards section with 3 users
-   * 3. Selected user feedback
-   * 4. SessionCard section with 1 session
-   * 5. Selected session feedback
-   * 6. BookingCard section with bookings
-   * 7. Footer
-   * 
-   * Grid layout using CSS Grid:
-   * - repeat(auto-fit, minmax(300px, 1fr)) - responsive cards
-   * - Each card takes at least 300px
-   */
+  // ===== Focus Input Function =====
+
+  const focusSearchInput = (): void => {
+    searchInputRef.current?.focus();
+  };
+
+  // ===== Loading State =====
+
+  if (isLoading) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <h2>📚 Loading Peer Tutoring Platform...</h2>
+        <p>Please wait while we load your data.</p>
+      </div>
+    );
+  }
+
+  // ===== Render =====
+
   return (
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto" }}>
       <h1>📚 Peer Tutoring Booking Platform</h1>
-      <p>GT2 Part 1 - React + TypeScript Components</p>
+      <p>GT2 Part 2 - React Hooks + State</p>
 
-      <hr style={{ margin: "2rem 0" }} />
+      <hr style={{ margin: "1.5rem 0" }} />
 
+      {/* ===== Search Section ===== */}
+      <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+        <input
+          ref={searchInputRef}
+          type="text"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="Search sessions..."
+          style={{
+            padding: "0.5rem 1rem",
+            fontSize: "1rem",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            flex: 1,
+            maxWidth: "400px"
+          }}
+        />
+        <button
+          onClick={focusSearchInput}
+          style={{
+            padding: "0.5rem 1rem",
+            cursor: "pointer",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            backgroundColor: "#f0f0f0"
+          }}
+        >
+          Search
+        </button>
+        <button
+          onClick={toggleDetails}
+          style={{
+            padding: "0.5rem 1rem",
+            cursor: "pointer",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            backgroundColor: showDetails ? "#e0f7fa" : "#f5f5f5"
+          }}
+        >
+          {showDetails ? "Hide" : "Show"} Details
+        </button>
+      </div>
+
+      {/* ===== Previous Search Display ===== */}
+      {previousSearch !== undefined && previousSearch !== searchTerm && (
+        <p style={{ color: "#666", fontSize: "0.9rem", marginBottom: "1rem" }}>
+          Previous search: "{previousSearch}"
+        </p>
+      )}
+
+      {/* ===== Selected User Display ===== */}
+      {selectedUser && (
+        <p style={{ padding: "0.5rem", backgroundColor: "#e0f7fa", borderRadius: "4px" }}>
+          ✅ Selected User: {selectedUser.name} ({selectedUser.role})
+        </p>
+      )}
+
+      <hr style={{ margin: "1.5rem 0" }} />
+
+      {/* ===== Users Section ===== */}
       <h2>👤 Users</h2>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
-        <UserCard user={tutor} onSelect={handleSelectUser} />
-        <UserCard user={tutee} onSelect={handleSelectUser} />
-        <UserCard user={admin} onSelect={handleSelectUser} />
+        {allUsers.map((user) => (
+          <UserCard key={user.id} user={user} onSelect={handleSelectUser} />
+        ))}
       </div>
 
-      {selectedUser && (
-        <p style={{ marginTop: "1rem", padding: "0.5rem", backgroundColor: "#e0f7fa", borderRadius: "4px" }}>
-          ✅ Selected: {selectedUser.name} ({selectedUser.role})
+      <hr style={{ margin: "1.5rem 0" }} />
+
+      {/* ===== Sessions Section ===== */}
+      <h2>📖 Sessions ({filteredSessions.length})</h2>
+      {showDetails && (
+        <p style={{ color: "#666", fontSize: "0.9rem" }}>
+          💡 Showing {filteredSessions.length} session(s). Search to filter.
         </p>
       )}
-
-      <hr style={{ margin: "2rem 0" }} />
-
-      <h2>📖 Sessions</h2>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
-        <SessionCard session={session} onBook={handleBookSession} />
+        {filteredSessions.length > 0 ? (
+          filteredSessions.map((s) => (
+            <SessionCard key={s.id} session={s} onBook={handleBookSession} />
+          ))
+        ) : (
+          <p>No sessions found matching "{searchTerm}"</p>
+        )}
       </div>
 
-      {selectedSession && (
-        <p style={{ marginTop: "1rem", padding: "0.5rem", backgroundColor: "#fff3e0", borderRadius: "4px" }}>
-          📖 Selected Session: {selectedSession.subject}
-        </p>
-      )}
+      <hr style={{ margin: "1.5rem 0" }} />
 
-      <hr style={{ margin: "2rem 0" }} />
-
-      <h2>📝 Bookings</h2>
+      {/* ===== Bookings Section ===== */}
+      <h2>📝 Bookings ({bookings.length})</h2>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1rem" }}>
         {bookings.map((b) => (
           <BookingCard key={b.id} booking={b} onCancel={handleCancelBooking}>
@@ -220,10 +270,24 @@ function App() {
         ))}
       </div>
 
-      <hr style={{ margin: "2rem 0" }} />
+      <hr style={{ margin: "1.5rem 0" }} />
 
-      <footer style={{ textAlign: "center", color: "#666", fontSize: "0.9rem" }}>
-        <p>ITELECT4 - GT2 Part 1 | React + TypeScript Components</p>
+      {/* ===== Debug Info (Optional) ===== */}
+      {showDetails && (
+        <div style={{ backgroundColor: "#f5f5f5", padding: "1rem", borderRadius: "4px" }}>
+          <h3>🔍 Debug Info</h3>
+          <p><strong>Search Term:</strong> "{searchTerm}"</p>
+          <p><strong>Previous Search:</strong> "{previousSearch}"</p>
+          <p><strong>Sessions Count:</strong> {sessions.length}</p>
+          <p><strong>Filtered Sessions:</strong> {filteredSessions.length}</p>
+          <p><strong>Bookings Count:</strong> {bookings.length}</p>
+          <p><strong>Selected User:</strong> {selectedUser?.name || "None"}</p>
+          <p><strong>Show Details:</strong> {showDetails ? "Yes" : "No"}</p>
+        </div>
+      )}
+
+      <footer style={{ textAlign: "center", color: "#666", fontSize: "0.9rem", marginTop: "2rem" }}>
+        <p>ITELECT4 - GT2 Part 2 | React Hooks + State</p>
         <p>Jeric Lique © 2026</p>
       </footer>
     </div>
