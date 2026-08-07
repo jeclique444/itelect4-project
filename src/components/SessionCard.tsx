@@ -1,78 +1,63 @@
-// Import the Session type from our types folder
 import type { Session } from "../types/index";
 
-/**
- * SessionCardProps Interface
- * Defines the props for the SessionCard component
- * 
- * @property session - The Session object to display (required)
- * @property onBook - Optional callback when session is booked
- */
 interface SessionCardProps {
   session: Session;
-  onBook?: (session: Session) => void;    // Optional callback
+  onBook?: (session: Session) => void;
+  variant?: "default" | "compact";  // <-- NEW variant prop
 }
 
-/**
- * SessionCard Component
- * Displays tutoring session information with booking functionality
- * 
- * This component demonstrates:
- * 1. Typed props with Session interface
- * 2. Helper function for status display
- * 3. Typed event handler
- * 4. Date formatting with toLocaleString()
- */
-function SessionCard({ session, onBook }: SessionCardProps) {
-  /**
-   * handleBook - Typed event handler for booking
-   * React.MouseEvent<HTMLButtonElement> ensures type safety
-   * 
-   * e parameter is typed to the exact event type
-   * The function returns void (no return value)
-   */
-  const handleBook = (_e: React.MouseEvent<HTMLButtonElement>): void => {
-  if (onBook) {
-    onBook(session);
-  }
-};
+function SessionCard({ session, onBook, variant = "default" }: SessionCardProps) {
+  const isCompact = variant === "compact";
 
-  /**
-   * getStatusColor - Helper function
-   * Returns an emoji based on session status
-   * This is a pure function - same input always gives same output
-   * 
-   * switch statement handles all possible status values
-   */
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active": return "🟢";      // Green - available
-      case "cancelled": return "🔴";    // Red - cancelled
-      case "full": return "🟡";        // Yellow - full capacity
-      default: return "⚪";            // White - unknown status
+  const handleBook = (_e: React.MouseEvent<HTMLButtonElement>): void => {
+    if (onBook) {
+      onBook(session);
     }
   };
 
-  /**
-   * JSX Return
-   * Demonstrates:
-   * - Function call in JSX: {getStatusColor(session.status)}
-   * - Date formatting: new Date(session.schedule).toLocaleString()
-   * - Conditional rendering: only show onBook if it exists
-   */
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active": return "🟢";
+      case "cancelled": return "🔴";
+      case "full": return "🟡";
+      default: return "⚪";
+    }
+  };
+
   return (
-    <div className="session-card" style={{ border: "1px solid #ccc", padding: "1rem", margin: "0.5rem 0", borderRadius: "8px" }}>
-      <h3>{session.subject}</h3>
-      <p>{session.description}</p>
-      <p>📚 {session.subject} - {session.duration} mins</p>
-      <p>👨‍🏫 Tutor ID: {session.tutorId}</p>
-      <p>📅 {new Date(session.schedule).toLocaleString()}</p>
-      <p>📍 {session.location}</p>
-      <p>💰 ₱{session.price}</p>
-      <p>👥 Capacity: {session.capacity} students</p>
-      <p>Status: {getStatusColor(session.status)} {session.status}</p>
+    <div className={`rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800 ${isCompact ? "p-3" : "p-5"}`}>
+      <h3 className={`font-bold text-gray-900 dark:text-white ${isCompact ? "text-sm" : "text-lg"}`}>
+        {session.subject}
+      </h3>
+      {!isCompact && (
+        <p className="text-gray-600 dark:text-gray-300">{session.description}</p>
+      )}
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        📚 {session.subject} - {session.duration} mins
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        👨‍🏫 Tutor ID: {session.tutorId}
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        📅 {new Date(session.schedule).toLocaleString()}
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        📍 {session.location}
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        💰 ₱{session.price}
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        👥 Capacity: {session.capacity} students
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Status: {getStatusColor(session.status)} {session.status}
+      </p>
       {onBook && (
-        <button onClick={handleBook} style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>
+        <button
+          onClick={handleBook}
+          className={`mt-3 rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:bg-green-500 dark:hover:bg-green-600 ${isCompact ? "w-full text-xs" : ""}`}
+        >
           Book Session
         </button>
       )}

@@ -1,66 +1,44 @@
-// Import the User type from our types folder
-// 'import type' is used for TypeScript types only (removed at compile time)
 import type { User } from "../types/index";
 
-/**
- * UserCardProps Interface
- * Defines the shape of props this component accepts
- * 
- * @property user - The User object to display (required)
- * @property onSelect - Optional callback function when user is selected
- */
 interface UserCardProps {
   user: User;
-  onSelect?: (user: User) => void;    // Optional callback prop
+  onSelect?: (user: User) => void;
 }
 
-/**
- * UserCard Component
- * A reusable component that displays user information
- * 
- * @param props - UserCardProps
- * @returns JSX element
- * 
- * This component demonstrates:
- * 1. Typed props using an interface
- * 2. Optional callback prop (onSelect)
- * 3. Typed event handler (React.MouseEvent)
- * 4. Conditional rendering (rating, subjects, button)
- */
 function UserCard({ user, onSelect }: UserCardProps) {
-  /**
-   * handleClick - Typed event handler
-   * React.MouseEvent<HTMLButtonElement> types the click event
-   * The generic <HTMLButtonElement> specifies the exact element type
-   * 
-   * e: React.MouseEvent<HTMLButtonElement> - e is the event object
-   * :void - function doesn't return anything
-   */
   const handleClick = (_e: React.MouseEvent<HTMLButtonElement>): void => {
-  if (onSelect) {
-    onSelect(user);
-  }
-};
+    if (onSelect) {
+      onSelect(user);
+    }
+  };
 
-  /**
-   * JSX Return
-   * Inline styles are used for simplicity (will be replaced with Tailwind later)
-   * 
-   * Conditional rendering examples:
-   * - {user.rating && <p>...</p>} - Only shows if rating exists
-   * - {user.subjects && <p>...</p>} - Only shows if subjects exist
-   * - {onSelect && <button>...</button>} - Only shows if onSelect exists
-   */
   return (
-    <div className="user-card" style={{ border: "1px solid #ccc", padding: "1rem", margin: "0.5rem 0", borderRadius: "8px" }}>
-      <h3>{user.name}</h3>
-      <p>Email: {user.email}</p>
-      <p>Role: {user.role}</p>
-      <p>Status: {user.isActive ? "✅ Active" : "❌ Inactive"}</p>
-      {user.rating && <p>Rating: ⭐ {user.rating}/5</p>}
-      {user.subjects && <p>Subjects: {user.subjects.join(", ")}</p>}
+    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+        {user.name}
+      </h3>
+      <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Role: {user.role}
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Status: {user.isActive ? "✅ Active" : "❌ Inactive"}
+      </p>
+      {user.rating && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Rating: ⭐ {user.rating}/5
+        </p>
+      )}
+      {user.subjects && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Subjects: {user.subjects.join(", ")}
+        </p>
+      )}
       {onSelect && (
-        <button onClick={handleClick} style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>
+        <button
+          onClick={handleClick}
+          className="mt-3 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600"
+        >
           Select User
         </button>
       )}
