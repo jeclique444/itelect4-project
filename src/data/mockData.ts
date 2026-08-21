@@ -1,4 +1,4 @@
-import type { User, Session, Booking } from "../types/index";
+import type { User } from "../types/index";
 
 export const tutor: User = {
   id: 1,
@@ -27,28 +27,3 @@ export const admin: User = {
 };
 
 export const allUsers: User[] = [tutor, tutee, admin];
-
-export const allSessions: Session[] = [
-  {
-    id: 1,
-    tutorId: 1,
-    subject: "Mathematics",
-    description: "Advanced Calculus tutoring session",
-    duration: 60,
-    capacity: 5,
-    schedule: new Date("2026-08-01T14:00:00"),
-    price: 500,
-    location: "Library Room MB 301",
-    status: "active"
-  }
-];
-
-export const allBookings: Booking[] = [
-  {
-    id: 1,
-    sessionId: 1,
-    tuteeId: 2,
-    status: "requested",
-    bookedAt: new Date()
-  }
-];

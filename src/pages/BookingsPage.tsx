@@ -1,18 +1,35 @@
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { ApiBooking } from "../types/index";
 import BookingCard from "../components/BookingCard";
-import { allBookings } from "../data/mockData";
-import type { Booking } from "../types/index";
+import { fetchBookings } from "../api/client";
 
 function BookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>(allBookings);
+  const { data, isPending, isError, error } = useQuery<ApiBooking[]>({
+    queryKey: ["bookings"],
+    queryFn: fetchBookings,
+  });
 
-  const handleCancelBooking = (booking: Booking) => {
-    const updatedBookings = bookings.map((b) =>
-      b.id === booking.id ? { ...b, status: "cancelled" as const } : b
-    );
-    setBookings(updatedBookings);
-    alert(`Booking #${booking.id} cancelled!`);
+  const handleCancelBooking = (booking: ApiBooking) => {
+    alert(`Booking #${booking.id} would be cancelled!`);
   };
+
+  if (isPending) {
+    return (
+      <div className="animate-pulse p-6 text-gray-500 dark:text-gray-400">
+        Loading bookings...
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-lg bg-red-50 p-4 text-red-700 dark:bg-red-900/20 dark:text-red-400">
+        {error.message} — is json-server running?
+      </div>
+    );
+  }
+
+  const bookings = data ?? [];
 
   return (
     <div>
@@ -21,9 +38,7 @@ function BookingsPage() {
       </h2>
 
       {bookings.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-400">
-          You have no bookings yet.
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">No bookings yet.</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {bookings.map((b) => (
