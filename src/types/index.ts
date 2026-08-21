@@ -180,3 +180,31 @@ export enum SessionStatus {
   Cancelled,   // 1
   Full         // 2
 }
+// ========================================
+// API TYPES - For data from json-server
+// ========================================
+
+// JSON has no Date type, and json-server writes ids as strings.
+// These types represent what the API actually returns.
+
+// ApiSession - Session as returned by the API
+// 'id' becomes string, 'schedule' becomes string (ISO date)
+export type ApiSession = Omit<Session, "id" | "schedule"> & {
+  id: string;
+  schedule: string;
+};
+
+// ApiBooking - Booking as returned by the API
+// 'id' becomes string, 'bookedAt' becomes string (ISO date)
+export type ApiBooking = Omit<Booking, "id" | "bookedAt"> & {
+  id: string;
+  bookedAt: string;
+};
+
+// NewSession - What we send when creating a new session
+// No id yet - the server generates it
+export type NewSession = Omit<ApiSession, "id">;
+
+// NewBooking - What we send when creating a new booking
+// No id yet - the server generates it
+export type NewBooking = Omit<ApiBooking, "id">;

@@ -1,18 +1,20 @@
-import type { Booking } from "../types/index";
+import type { ApiBooking } from "../types/index";
 import React from "react";
 
 interface BookingCardProps {
-  booking: Booking;
-  onCancel?: (booking: Booking) => void;
+  booking: ApiBooking;                 // ✅ Changed from Booking to ApiBooking
+  onCancel?: (booking: ApiBooking) => void;
   children?: React.ReactNode;
-  variant?: "default" | "compact";  // <-- NEW variant prop
+  variant?: "default" | "compact";
+  className?: string;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ 
-  booking, 
-  onCancel, 
+const BookingCard: React.FC<BookingCardProps> = ({
+  booking,
+  onCancel,
   children,
-  variant = "default" 
+  variant = "default",
+  className = ""
 }) => {
   const isCompact = variant === "compact";
 
@@ -34,7 +36,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
   };
 
   return (
-    <div className={`rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800 ${isCompact ? "p-3" : "p-5"}`}>
+    <div className={`rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-800 ${isCompact ? "p-3" : "p-5"} ${className}`}>
       <h3 className={`font-bold text-gray-900 dark:text-white ${isCompact ? "text-sm" : "text-lg"}`}>
         Booking #{booking.id}
       </h3>

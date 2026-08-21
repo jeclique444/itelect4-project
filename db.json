@@ -1,0 +1,56 @@
+{
+  "sessions": [
+    {
+      "id": "1",
+      "tutorId": 1,
+      "subject": "Mathematics",
+      "description": "Advanced Calculus tutoring session",
+      "duration": 60,
+      "capacity": 5,
+      "schedule": "2026-08-10T14:00:00.000Z",
+      "price": 500,
+      "location": "Library Room MB 301",
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "tutorId": 1,
+      "subject": "Physics",
+      "description": "Mechanics and Thermodynamics",
+      "duration": 90,
+      "capacity": 3,
+      "schedule": "2026-08-12T10:00:00.000Z",
+      "price": 600,
+      "location": "Science Building Room 201",
+      "status": "active"
+    },
+    {
+      "id": "3",
+      "tutorId": 1,
+      "subject": "Programming",
+      "description": "TypeScript and React basics",
+      "duration": 120,
+      "capacity": 4,
+      "schedule": "2026-08-14T13:00:00.000Z",
+      "price": 700,
+      "location": "Computer Lab 302",
+      "status": "full"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "1",
+      "sessionId": "1",
+      "tuteeId": 2,
+      "status": "confirmed",
+      "bookedAt": "2026-08-01T11:58:12.000Z"
+    },
+    {
+      "id": "2",
+      "sessionId": "2",
+      "tuteeId": 2,
+      "status": "requested",
+      "bookedAt": "2026-08-01T12:00:00.000Z"
+    }
+  ]
+}
