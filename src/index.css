@@ -1,7 +1,9 @@
+/* ====== TAILWIND v3 DIRECTIVES ====== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ====== SHADCN THEME VARIABLES ====== */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -49,6 +51,7 @@
   }
 }
 
+/* ====== UTILITY CLASSES FOR SHADCN ====== */
 @layer utilities {
   .border-border {
     border-color: hsl(var(--border));
@@ -71,13 +74,78 @@
   .text-destructive-foreground {
     color: hsl(var(--destructive-foreground));
   }
-  .border-input {
-    border-color: hsl(var(--input));
-  }
   .bg-secondary {
     background-color: hsl(var(--secondary));
   }
   .text-secondary-foreground {
     color: hsl(var(--secondary-foreground));
+  }
+  .bg-muted {
+    background-color: hsl(var(--muted));
+  }
+  .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
+  }
+  .bg-accent {
+    background-color: hsl(var(--accent));
+  }
+  .text-accent-foreground {
+    color: hsl(var(--accent-foreground));
+  }
+  .border-input {
+    border-color: hsl(var(--input));
+  }
+  .bg-card {
+    background-color: hsl(var(--card));
+  }
+  .text-card-foreground {
+    color: hsl(var(--card-foreground));
+  }
+}
+
+/* ====== CUSTOM ANIMATIONS (Optional) ====== */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(30px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+  .animate-shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .dark .glass {
+    background: rgba(31, 41, 55, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-hover:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+  }
+  .dark .card-hover:hover {
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
   }
 }
