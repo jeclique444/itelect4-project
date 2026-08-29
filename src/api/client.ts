@@ -1,4 +1,6 @@
-import type { ApiSession, NewSession, ApiBooking, NewBooking } from "../types/index";
+import type { ApiSession, NewSession, ApiBooking, NewBooking, ApiCourse, ApiSubmission, NewSubmission } from "../types/index";
+
+
 const API_URL = "http://localhost:3001";
 
 // ========================================
@@ -53,6 +55,44 @@ export async function createBooking(newBooking: NewBooking): Promise<ApiBooking>
   });
   if (!res.ok) {
     throw new Error("Could not save the booking");
+  }
+  return res.json();
+}
+
+  // ========================================
+// COURSES API
+// ========================================
+
+export async function fetchCourses(): Promise<ApiCourse[]> {
+  const res = await fetch(`${API_URL}/courses`);
+  if (!res.ok) {
+    throw new Error("Could not load courses");
+  }
+  return res.json();
+}
+
+// ========================================
+// SUBMISSIONS API
+// ========================================
+
+export async function fetchSubmissions(): Promise<ApiSubmission[]> {
+  const res = await fetch(`${API_URL}/submissions`);
+  if (!res.ok) {
+    throw new Error("Could not load submissions");
+  }
+  return res.json();
+}
+
+export async function createSubmission(
+  newSubmission: NewSubmission
+): Promise<ApiSubmission> {
+  const res = await fetch(`${API_URL}/submissions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newSubmission),
+  });
+  if (!res.ok) {
+    throw new Error("Could not save the submission");
   }
   return res.json();
 }

@@ -7,6 +7,7 @@ import SessionDetailPage from "./pages/SessionDetailPage";
 import BookingsPage from "./pages/BookingsPage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SubmissionsPage from "./pages/SubmissionsPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="bookings" element={<BookingsPage />} />
+          <Route path="submissions" element={<SubmissionsPage />} />  {/* ✅ NEW */}
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>

@@ -32,6 +32,9 @@ function Layout() {
           <NavLink to="/bookings" className={linkClass}>
             Bookings
           </NavLink>
+          <NavLink to="/submissions" className={linkClass}>
+            Submissions
+            </NavLink>  
 
           <div className="ml-auto flex items-center gap-2">
             <button

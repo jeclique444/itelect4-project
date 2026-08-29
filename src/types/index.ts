@@ -208,3 +208,40 @@ export type NewSession = Omit<ApiSession, "id">;
 // NewBooking - What we send when creating a new booking
 // No id yet - the server generates it
 export type NewBooking = Omit<ApiBooking, "id">;
+
+// ========================================
+// COURSE & SUBMISSION TYPES - For the Submissions feature
+// ========================================
+
+// Course - Represents a course/subject
+export interface Course {
+  id: number | string;
+  code: string;          // e.g., "ITELECT4"
+  title: string;         // e.g., "IT Elective 4"
+  units: number;
+  semester: string;
+}
+
+// Submission - Represents a student's submission
+export interface Submission {
+  id: number;
+  studentId: number;
+  courseCode: string;
+  repoUrl: string;
+  submittedAt: Date;
+  score?: number;
+}
+
+// ApiCourse - Course as returned by the API (id as string)
+export type ApiCourse = Omit<Course, "id"> & {
+  id: string;
+};
+
+// ApiSubmission - Submission as returned by the API
+export type ApiSubmission = Omit<Submission, "id" | "submittedAt"> & {
+  id: string;
+  submittedAt: string;
+};
+
+// NewSubmission - What we send when creating a new submission
+export type NewSubmission = Omit<ApiSubmission, "id">;
