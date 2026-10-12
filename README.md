@@ -1,5 +1,10 @@
 # ITELECT4 Project - Peer Tutoring Booking Platform
 
+## Live URLs
+
+- **Frontend App:** https://itelect4-project-two.vercel.app
+- **Backend API:** https://itelect4-backend-neon.vercel.app
+
 ## Project Concept
 A web application where students can book tutoring sessions from peer tutors. 
 Tutors create sessions, students book them, and both parties can track progress 
