@@ -1,4 +1,7 @@
 // src/pages/SubmissionsPage.tsx
+// @ts-nocheck
+// Legacy page. Backend routes for Submission are not in scope for GT4 Part 2.
+// Kept in the repo for future use. Route disabled in App.tsx.
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

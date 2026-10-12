@@ -1,40 +1,60 @@
 // src/pages/LoginPage.tsx
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useAuthStore from "../store/authStore";
 import useUiStore from "../store/uiStore";
+import { loginUser } from "../api/client";
+import { loginSchema } from "../schemas/authSchema";
+import type { LoginFormValues } from "../schemas/authSchema";
 
 function LoginPage() {
-  const [name, setName] = useState<string>("");
-  const login = useAuthStore((state) => state.login);
+  const setSession = useAuthStore((state) => state.setSession);
   const navigate = useNavigate();
 
-  // 👇 Dark mode state
   const isDarkMode = useUiStore((state) => state.isDarkMode);
   const toggleDarkMode = useUiStore((state) => state.toggleDarkMode);
 
-  const handleLogin = (): void => {
-    if (name.trim() === "") return;
-    login(name);
-    navigate("/");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur",
+    defaultValues: { email: "", password: "" },
+  });
+
+  // Logging in is a POST that changes something on the server, so it
+  // is a mutation and not a query.
+  const logIn = useMutation({
+    mutationFn: loginUser,
+    onSuccess: (reply) => {
+      // The token came from the API this time. The store just keeps it.
+      setSession(reply.token, reply.user.name);
+      navigate("/sessions");
+    },
+  });
+
+  const onSubmit = (values: LoginFormValues): void => {
+    logIn.mutate(values);
   };
 
   return (
     <div className={isDarkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        {/* 👇 Header — Peer Tutoring Platform + Dark Mode Toggle */}
+        {/* Header — Peer Tutoring Platform + Dark Mode Toggle */}
         <header className="glass sticky top-0 z-50 border-b border-gray-200/50 dark:border-gray-700/50">
           <div className="container mx-auto flex items-center justify-between p-4">
-            {/* Brand Name */}
             <span className="flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               <span className="text-2xl">📚</span>
               Peer Tutoring Platform
             </span>
 
-            {/* Dark Mode Toggle — may label */}
             <button
               onClick={toggleDarkMode}
               className="flex items-center gap-2 rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-all hover:scale-105 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
@@ -45,7 +65,7 @@ function LoginPage() {
           </div>
         </header>
 
-        {/* 👇 Login Form — centered */}
+        {/* Login Form — centered */}
         <div className="flex min-h-[80vh] items-center justify-center p-4">
           <div className="w-full max-w-md rounded-2xl border-2 border-gray-200/80 bg-white/90 p-8 shadow-xl backdrop-blur-sm dark:border-gray-600/80 dark:bg-gray-800/90">
             {/* Header with Icon */}
@@ -80,41 +100,72 @@ function LoginPage() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                  Just type your name
+                  Sign in with your account
                 </span>
               </div>
             </div>
 
             {/* Form */}
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  What do we call you?
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Email
                 </Label>
                 <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Juan dela Cruz"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleLogin();
-                  }}
+                  id="email"
+                  type="email"
+                  {...register("email")}
+                  aria-invalid={errors.email ? true : undefined}
+                  placeholder="juan@dlsl.edu.ph"
                   className="h-11 border-2 border-gray-200/80 bg-white/90 text-gray-900 placeholder:text-gray-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-400/20 dark:border-gray-600/80 dark:bg-gray-800/90 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-500"
                 />
+                {errors.email && (
+                  <p className="text-sm text-rose-600 dark:text-rose-400">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  {...register("password")}
+                  aria-invalid={errors.password ? true : undefined}
+                  placeholder="At least 8 characters"
+                  className="h-11 border-2 border-gray-200/80 bg-white/90 text-gray-900 placeholder:text-gray-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-400/20 dark:border-gray-600/80 dark:bg-gray-800/90 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-blue-500"
+                />
+                {errors.password && (
+                  <p className="text-sm text-rose-600 dark:text-rose-400">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               <Button
-                onClick={handleLogin}
-                disabled={name.trim() === ""}
+                type="submit"
+                disabled={logIn.isPending}
                 className="h-11 w-full rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 text-base font-semibold text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-95 disabled:opacity-50 disabled:hover:scale-100 dark:from-blue-600 dark:to-indigo-600 [text-shadow:_0_1px_4px_rgba(0,0,0,0.15)]"
               >
-                {name.trim() ? "Log in" : "Type your name to start"}
+                {logIn.isPending ? "Signing in..." : "Log in"}
               </Button>
 
-              <p className="text-center text-xs text-gray-400 dark:text-gray-500">
-                No password needed — just your name, and you're in!
+              {logIn.isError && (
+                <p className="rounded-lg bg-rose-50 p-3 text-center text-sm text-rose-700 dark:bg-rose-900/20 dark:text-rose-400">
+                  {logIn.error.message}
+                </p>
+              )}
+
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                No account yet?{" "}
+                <Link to="/register" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                  Register
+                </Link>
               </p>
-            </div>
+            </form>
           </div>
         </div>
       </div>
