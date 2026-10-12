@@ -4,28 +4,26 @@
 
 // INTERFACE 1: User
 // Represents anyone using the platform (tutor, tutee, or admin)
-// This is our main user entity with all necessary fields
 export interface User {
-  id: number;              // Unique identifier 
-  name: string;                     // Full name of the user
-  email: string;                    // Email address for login/notifications
+  id: number;                        // Unique identifier
+  name: string;                      // Full name of the user
+  email: string;                     // Email address for login/notifications
   role: "tutor" | "tutee" | "admin"; // Literal union - only these 3 roles allowed
-  isActive: boolean;                // Account status (active/inactive)
-  rating?: number;                  // Optional - tutor rating (1-5 stars)
-  subjects?: string[];              // Optional - subjects the tutor can teach
+  isActive: boolean;                 // Account status (active/inactive)
+  rating?: number;                   // Optional - tutor rating (1-5 stars)
+  subjects?: string[];               // Optional - subjects the tutor can teach
 }
 
 // INTERFACE 2: Session
 // Represents a tutoring session offered by a tutor
-// This entity has a status lifecycle (active → full/cancelled)
 export interface Session {
   id: number;                       // Unique identifier
   tutorId: number;                  // Reference to User (who is teaching)
-  subject: string;                  // Subject being taught (e.g., "Mathematics")
-  description: string;              // Detailed description of the session
+  subject: string;                  // Subject being taught
+  description: string;              // Detailed description
   duration: number;                 // Duration in minutes
   capacity: number;                 // Maximum number of students allowed
-  schedule: Date;                   // When the session happens (date/time)
+  schedule: Date;                   // When the session happens
   price: number;                    // Cost per session in PHP
   location: string;                 // Where the session takes place
   status: "active" | "cancelled" | "full"; // Current session status
@@ -33,84 +31,54 @@ export interface Session {
 
 // INTERFACE 3: Booking
 // Represents a booking made by a tutee for a specific session
-// This entity has a complete status lifecycle:
-// requested → confirmed → completed (or waitlisted/cancelled)
 export interface Booking {
-  id: number;                       // Unique identifier
-  sessionId: number;                // Reference to Session being booked
-  tuteeId: number;                  // Reference to User (who is booking)
+  id: number;
+  sessionId: number;
+  tuteeId: number;
   status: "requested" | "confirmed" | "waitlisted" | "completed" | "cancelled";
-  bookedAt: Date;                   // When the booking was made
-  attendedAt?: Date;                // Optional - when they attended
-  feedback?: string;                // Optional - feedback after session
-  rating?: number;                  // Optional - rating given to tutor (1-5)
+  bookedAt: Date;
+  attendedAt?: Date;
+  feedback?: string;
+  rating?: number;
 }
 
 // ========================================
 // TYPE ALIASES
 // ========================================
 
-// Type aliases make complex types easier to use and reuse
-export type ID = number;                    // Flexible ID type
-export type StringOrNumber = string | number;        // Union type for flexibility
-export type Status = "pending" | "active" | "inactive"; // Generic status
+export type ID = number;
+export type StringOrNumber = string | number;
+export type Status = "pending" | "active" | "inactive";
 export type BookingStatus = "requested" | "confirmed" | "waitlisted" | "completed" | "cancelled";
 
 // ========================================
 // UTILITY TYPES
 // ========================================
 
-// Utility Type 1: Partial<T>
-// Makes all fields optional - perfect for update payloads
-// Instead of sending all fields, you only send what changed
 export type UserUpdate = Partial<User>;
-
-// Utility Type 2: Pick<T, K>
-// Creates a new type with only selected fields
-// Useful for previews/lists where you don't need all data
 export type UserPreview = Pick<User, "id" | "name" | "role" | "rating">;
-
-// Utility Type 3: Omit<T, K>
-// Creates a new type by excluding fields
-// Useful for public profiles (hide sensitive data like email)
 export type PublicUser = Omit<User, "email" | "isActive" | "subjects">;
-
-// Utility Type 4: Record<K, T>
-// Maps specific keys to the same value type
-// Perfect for dashboard statistics or counts
 export type RoleCount = Record<"tutor" | "tutee" | "admin", number>;
 
 // ========================================
 // GENERIC INTERFACE
 // ========================================
 
-// Generic Interface: ApiResponse<T>
-// A reusable interface that works with ANY data type
-// T is a placeholder - it becomes whatever type you specify
-// This ensures consistent API responses across your entire app
 export interface ApiResponse<T> {
-  success: boolean;                 // Did the operation succeed?
-  data: T;                          // The actual data (any type)
-  message?: string;                 // Optional success/error message
-  timestamp?: Date;                 // Optional timestamp
+  success: boolean;
+  data: T;
+  message?: string;
+  timestamp?: Date;
 }
 
 // ========================================
 // GENERIC FUNCTIONS
 // ========================================
 
-// Generic Function 1: getFirst<T>
-// Works with any array type
-// T is inferred from whatever array you pass in
-// Returns the first element or undefined if array is empty
 export function getFirst<T>(items: T[]): T | undefined {
   return items[0];
 }
 
-// Generic Function 2: getById<T>
-// Constrained generic - T must have an "id" field
-// This ensures only types with 'id' can use this function
-// Returns the item with matching id or undefined
 export function getById<T extends { id: number }>(
   items: T[],
   id: number
@@ -118,10 +86,6 @@ export function getById<T extends { id: number }>(
   return items.find((item) => item.id === id);
 }
 
-// Generic Function 3: getItemsByStatus<T>
-// Constrained generic - T must have a "status" field
-// Filters items by their status
-// Useful for getting active sessions, pending bookings, etc.
 export function getItemsByStatus<T extends { status: string }>(
   items: T[],
   status: string
@@ -129,10 +93,6 @@ export function getItemsByStatus<T extends { status: string }>(
   return items.filter((item) => item.status === status);
 }
 
-// Generic Function 4: createApiResponse<T>
-// A factory function that creates consistent API responses
-// Automatically adds a timestamp
-// Can be used for any data type
 export function createApiResponse<T>(
   data: T,
   success: boolean = true,
@@ -142,7 +102,7 @@ export function createApiResponse<T>(
     success,
     data,
     message,
-    timestamp: new Date()
+    timestamp: new Date(),
   };
 }
 
@@ -150,79 +110,79 @@ export function createApiResponse<T>(
 // ENUMS
 // ========================================
 
-// ENUM 1: Regular Enum - BookingStatusEnum
-// Exists at runtime - can be used for reverse mapping
-// Reverse mapping: BookingStatusEnum["requested"] returns "Requested"
-// Useful when you need to loop through values or display names
 export enum BookingStatusEnum {
   Requested = "requested",
   Confirmed = "confirmed",
   Waitlisted = "waitlisted",
   Completed = "completed",
-  Cancelled = "cancelled"
+  Cancelled = "cancelled",
 }
 
-// ENUM 2: Const Enum - UserRole
-// Inlined at compile time - zero runtime overhead
-// More performant for simple values
-// Cannot be reverse mapped (no UserRole["tutor"])
 export const enum UserRole {
   Tutor = "tutor",
   Tutee = "tutee",
-  Admin = "admin"
+  Admin = "admin",
 }
 
-// ENUM 3: Numeric Enum - SessionStatus
-// Auto-increments from 0: Active=0, Cancelled=1, Full=2
-// Supports reverse mapping: SessionStatus[0] returns "Active"
 export enum SessionStatus {
   Active,      // 0
   Cancelled,   // 1
-  Full         // 2
+  Full,        // 2
 }
+
 // ========================================
-// API TYPES - For data from json-server
+// API TYPES - for data from itelect4-backend
 // ========================================
 
-// JSON has no Date type, and json-server writes ids as strings.
-// These types represent what the API actually returns.
+// JSON has no Date type, and MongoDB sends ObjectIds as
+// 24-character hex strings. These types represent what the API
+// actually returns.
 
 // ApiSession - Session as returned by the API
-// 'id' becomes string, 'schedule' becomes string (ISO date)
-export type ApiSession = Omit<Session, "id" | "schedule"> & {
+// 'id' and 'tutorId' become strings (Mongo _id), 'schedule' becomes string
+export type ApiSession = Omit<Session, "id" | "tutorId" | "schedule"> & {
   id: string;
+  tutorId: string;
   schedule: string;
 };
 
+// NewSession - what we SEND when creating a new session.
+// tutorId comes off the token, so it is not in the body.
+// schedule is a Date from the form (backend will store it).
+export type NewSession = Pick<
+  Session,
+  "subject" | "description" | "duration" | "capacity" | "schedule" | "price" | "location"
+>;
+
 // ApiBooking - Booking as returned by the API
-// 'id' becomes string, 'bookedAt' becomes string (ISO date)
-export type ApiBooking = Omit<Booking, "id" | "bookedAt"> & {
+export type ApiBooking = Omit<Booking, "id" | "sessionId" | "tuteeId" | "bookedAt"> & {
   id: string;
+  sessionId: string;
+  tuteeId: string;
   bookedAt: string;
 };
 
-// NewSession - What we send when creating a new session
-// No id yet - the server generates it
-export type NewSession = Omit<ApiSession, "id">;
-
-// NewBooking - What we send when creating a new booking
-// No id yet - the server generates it
-export type NewBooking = Omit<ApiBooking, "id">;
+// NewBooking - what we send when creating a booking
+export type NewBooking = Omit<ApiBooking, "id" | "bookedAt">;
 
 // ========================================
-// COURSE & SUBMISSION TYPES - For the Submissions feature
+// COURSE & SUBMISSION TYPES
 // ========================================
 
-// Course - Represents a course/subject
+// Course - reference data. The backend has no id field for a course;
+// the code IS its identity.
 export interface Course {
-  id: number | string;
-  code: string;          // e.g., "ITELECT4"
-  title: string;         // e.g., "IT Elective 4"
+  code: string;
+  title: string;
   units: number;
   semester: string;
 }
 
-// Submission - Represents a student's submission
+// ApiCourse - course as returned by the API (identical to Course)
+export type ApiCourse = Course;
+
+// Submission - legacy from Session 7-8. Kept for the SubmissionsPage
+// that still imports it, but not wired to any live route.
 export interface Submission {
   id: number;
   studentId: number;
@@ -232,16 +192,28 @@ export interface Submission {
   score?: number;
 }
 
-// ApiCourse - Course as returned by the API (id as string)
-export type ApiCourse = Omit<Course, "id"> & {
+export type ApiSubmission = Omit<Submission, "id" | "studentId" | "submittedAt"> & {
   id: string;
-};
-
-// ApiSubmission - Submission as returned by the API
-export type ApiSubmission = Omit<Submission, "id" | "submittedAt"> & {
-  id: string;
+  studentId: string;
   submittedAt: string;
 };
 
-// NewSubmission - What we send when creating a new submission
-export type NewSubmission = Omit<ApiSubmission, "id">;
+export type NewSubmission = Pick<Submission, "courseCode" | "repoUrl">;
+
+// ========================================
+// AUTH TYPES - for /api/auth/register + /api/auth/login
+// ========================================
+
+// What /api/auth/register sends back, and what sits inside the
+// login reply. Session 1 said id was a number because there was no
+// database to number the rows.
+export type ApiUser = Omit<User, "id"> & {
+  id: string;
+};
+
+// What /api/auth/login sends back. The token is the string that goes
+// in the Authorization header on every request after this one.
+export interface AuthReply {
+  token: string;
+  user: ApiUser;
+}

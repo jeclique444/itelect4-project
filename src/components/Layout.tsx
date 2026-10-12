@@ -1,19 +1,18 @@
 // src/components/Layout.tsx
-import { NavLink, Outlet, useNavigate } from "react-router";  // ✅ ADD useNavigate
+import { NavLink, Outlet, useNavigate } from "react-router";
 import useAuthStore from "../store/authStore";
 import useUiStore from "../store/uiStore";
 
 function Layout() {
-  const navigate = useNavigate();  // ✅ ADD navigate hook
+  const navigate = useNavigate();
   const isDarkMode = useUiStore((state) => state.isDarkMode);
   const toggleDarkMode = useUiStore((state) => state.toggleDarkMode);
   const userName = useAuthStore((state) => state.userName);
   const logout = useAuthStore((state) => state.logout);
 
-  // ✅ UPDATE logout handler
   const handleLogout = (): void => {
-    logout();           // 1. Clear token and userName from store
-    navigate("/login"); // 2. Redirect to login page
+    logout();
+    navigate("/login");
   };
 
   const base = "rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200";
@@ -36,8 +35,7 @@ function Layout() {
             <div className="flex flex-wrap items-center gap-1.5">
               <NavLink to="/" end className={linkClass}>Dashboard</NavLink>
               <NavLink to="/sessions" className={linkClass}>Sessions</NavLink>
-              <NavLink to="/bookings" className={linkClass}>Bookings</NavLink>
-              <NavLink to="/submissions" className={linkClass}>Submissions</NavLink>
+              {/* Bookings + Submissions disabled for GT4 Part 2 */}
             </div>
 
             <div className="ml-auto flex items-center gap-3">
@@ -56,7 +54,6 @@ function Layout() {
                     <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                     👤 {userName}
                   </span>
-                  {/* ✅ UPDATED: handleLogout with redirect */}
                   <button
                     onClick={handleLogout}
                     className="rounded-lg bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 text-sm font-medium text-white transition-all hover:scale-105 hover:shadow-lg active:scale-95"
@@ -65,18 +62,25 @@ function Layout() {
                   </button>
                 </div>
               ) : (
-                <NavLink
-                  to="/login"
-                  className="rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-2 text-sm font-medium text-white transition-all hover:scale-105 hover:shadow-lg active:scale-95"
-                >
-                  Login
-                </NavLink>
+                <div className="flex items-center gap-2">
+                  <NavLink
+                    to="/register"
+                    className="rounded-lg border-2 border-blue-500 px-4 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                  >
+                    Register
+                  </NavLink>
+                  <NavLink
+                    to="/login"
+                    className="rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-2 text-sm font-medium text-white transition-all hover:scale-105 hover:shadow-lg active:scale-95"
+                  >
+                    Login
+                  </NavLink>
+                </div>
               )}
             </div>
           </div>
         </nav>
 
-        {/* Page Content with Fade In */}
         <main className="container mx-auto animate-fade-in p-4">
           <Outlet />
         </main>

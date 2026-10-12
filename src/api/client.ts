@@ -1,98 +1,91 @@
-import type { ApiSession, NewSession, ApiBooking, NewBooking, ApiCourse, ApiSubmission, NewSubmission } from "../types/index";
+import type { ApiSession, NewSession, ApiCourse, AuthReply, ApiUser } from "../types/index";
+import useAuthStore from "../store/authStore";
 
+// Vite only exposes variables whose name starts with VITE_, and it
+// replaces this at BUILD time -- the value that was in .env when
+// `npm run build` ran is baked into the bundle.
+export const API_URL = import.meta.env.VITE_API_URL;
 
-const API_URL = "http://localhost:3001";
+// The same guard db.ts has for MONGODB_URI, for the same reason: a
+// sentence now beats every call going to "undefined/api/sessions".
+if (!API_URL) {
+  throw new Error(
+    "VITE_API_URL is missing. Copy .env.example to .env, fill it in, " +
+      "and restart npm run dev.",
+  );
+}
 
-// ========================================
-// SESSIONS API
-// ========================================
+// Every call goes through here: the host, the JSON header, the token
+// when there is one, and the API's own message when it refuses.
+async function request<T>(
+  path: string,
+  init: RequestInit = {},
+): Promise<T> {
+  const token = useAuthStore.getState().token;
 
-export async function fetchSessions(): Promise<ApiSession[]> {
-  const res = await fetch(`${API_URL}/sessions`);
+  const res = await fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init.headers,
+    },
+  });
+
   if (!res.ok) {
-    throw new Error("Could not load sessions");
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message ?? `Request failed (${res.status})`);
   }
+
   return res.json();
 }
 
-export async function fetchSessionById(id: string): Promise<ApiSession> {
-  const res = await fetch(`${API_URL}/sessions/${id}`);
-  if (!res.ok) {
-    throw new Error(`Could not load session with id ${id}`);
-  }
-  return res.json();
+// ---- courses: public. request() sends no token, and none is needed.
+
+export function fetchCourses(): Promise<ApiCourse[]> {
+  return request<ApiCourse[]>("/api/courses");
 }
 
-export async function createSession(newSession: NewSession): Promise<ApiSession> {
-  const res = await fetch(`${API_URL}/sessions`, {
+export function fetchCourseByCode(code: string): Promise<ApiCourse> {
+  return request<ApiCourse>(`/api/courses/${code}`);
+}
+
+// ---- sessions: private. The token goes on automatically.
+
+export function fetchSessions(): Promise<ApiSession[]> {
+  return request<ApiSession[]>("/api/sessions");
+}
+
+export function fetchSessionById(id: string): Promise<ApiSession> {
+  return request<ApiSession>(`/api/sessions/${id}`);
+}
+
+export function createSession(newSession: NewSession): Promise<ApiSession> {
+  return request<ApiSession>("/api/sessions", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newSession),
   });
-  if (!res.ok) {
-    throw new Error("Could not save the session");
-  }
-  return res.json();
 }
 
-// ========================================
-// BOOKINGS API
-// ========================================
+// ---- auth: the two routes that make a session exist
 
-export async function fetchBookings(): Promise<ApiBooking[]> {
-  const res = await fetch(`${API_URL}/bookings`);
-  if (!res.ok) {
-    throw new Error("Could not load bookings");
-  }
-  return res.json();
-}
-
-export async function createBooking(newBooking: NewBooking): Promise<ApiBooking> {
-  const res = await fetch(`${API_URL}/bookings`, {
+export function registerUser(body: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<ApiUser> {
+  return request<ApiUser>("/api/auth/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newBooking),
+    body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    throw new Error("Could not save the booking");
-  }
-  return res.json();
 }
 
-  // ========================================
-// COURSES API
-// ========================================
-
-export async function fetchCourses(): Promise<ApiCourse[]> {
-  const res = await fetch(`${API_URL}/courses`);
-  if (!res.ok) {
-    throw new Error("Could not load courses");
-  }
-  return res.json();
-}
-
-// ========================================
-// SUBMISSIONS API
-// ========================================
-
-export async function fetchSubmissions(): Promise<ApiSubmission[]> {
-  const res = await fetch(`${API_URL}/submissions`);
-  if (!res.ok) {
-    throw new Error("Could not load submissions");
-  }
-  return res.json();
-}
-
-export async function createSubmission(
-  newSubmission: NewSubmission
-): Promise<ApiSubmission> {
-  const res = await fetch(`${API_URL}/submissions`, {
+export function loginUser(body: {
+  email: string;
+  password: string;
+}): Promise<AuthReply> {
+  return request<AuthReply>("/api/auth/login", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newSubmission),
+    body: JSON.stringify(body),
   });
-  if (!res.ok) {
-    throw new Error("Could not save the submission");
-  }
-  return res.json();
 }
