@@ -1,4 +1,4 @@
-import type { ApiSession, NewSession, ApiCourse, AuthReply, ApiUser } from "../types/index";
+import type { ApiSession, NewSession, ApiCourse, AuthReply, ApiUser, AiReview } from "../types/index";
 import useAuthStore from "../store/authStore";
 
 // Vite only exposes variables whose name starts with VITE_, and it
@@ -87,5 +87,15 @@ export function loginUser(body: {
   return request<AuthReply>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(body),
+  });
+}
+
+// ===== SESSION 11: one more private call ===============================
+// The token goes on automatically, which matters here more than anywhere:
+// without it, anyone could spend your Gemini quota.
+export function askAi(prompt: string): Promise<AiReview> {
+  return request<AiReview>("/api/ai", {
+    method: "POST",
+    body: JSON.stringify({ prompt }),
   });
 }
