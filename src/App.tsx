@@ -11,6 +11,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import useAuthStore from "./store/authStore";
+import ReviewPage from "./pages/ReviewPage"; // 
 
 function App() {
   const token = useAuthStore((state) => state.token);
@@ -39,6 +40,7 @@ function App() {
           <Route path="bookings" element={<BookingsPage />} />
           <Route path="submissions" element={<SubmissionsPage />} />
         </Route> */}
+          <Route path="review" element={<ReviewPage />} /> 
       </Route>
 
       {/* 404 — accessible kahit hindi logged in */}

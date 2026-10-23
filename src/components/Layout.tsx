@@ -35,6 +35,10 @@ function Layout() {
             <div className="flex flex-wrap items-center gap-1.5">
               <NavLink to="/" end className={linkClass}>Dashboard</NavLink>
               <NavLink to="/sessions" className={linkClass}>Sessions</NavLink>
+              
+              {/* 👇 ADDED THIS LINE 👇 */}
+              <NavLink to="/review" className={linkClass}>AI Review</NavLink>
+              
               {/* Bookings + Submissions disabled for GT4 Part 2 */}
             </div>
 
