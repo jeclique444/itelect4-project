@@ -10,7 +10,7 @@ A modern, responsive web application where students can book tutoring sessions f
 *   **Live Backend API:** [https://itelect4-backend-neon.vercel.app](https://itelect4-backend-neon.vercel.app)
 *   **Backend Repository:** [https://github.com/jeclique444/itelect4-backend](https://github.com/jeclique444/itelect4-backend)
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -24,7 +24,7 @@ flowchart LR
   be -- "GEMINI_API_KEY" --> ai
 ```
 
-## ✨ Key Features
+## Key Features
 
 - **Authentication:** Secure login and registration flow using JWT stored in a global state.
 - **Dashboard:** View and interact with user profiles via animated, 3D-tilting cards.
@@ -33,7 +33,7 @@ flowchart LR
 - **Dark Mode:** Full dark mode support across the entire application.
 - **Form Validation:** Robust client-side validation using Zod and React Hook Form.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **Framework:** React 18, Vite, TypeScript
 *   **Styling:** Tailwind CSS
@@ -43,7 +43,7 @@ flowchart LR
 *   **Routing:** React Router v6
 *   **Testing & CI:** Vitest, React Testing Library, GitHub Actions
 
-## 🚀 Local Setup
+## Local Setup
 
 ### Prerequisites
 - Node.js (v22 or higher)
@@ -74,7 +74,7 @@ flowchart LR
     ```
     The app will run on `http://localhost:5173`.
 
-## 🧪 Testing
+## Testing
 
 This project uses **Vitest** and **React Testing Library** for component, hook, and form testing.
 
@@ -91,7 +91,7 @@ npm run build
 
 *Note: The CI workflow in `.github/workflows/ci.yml` runs tests, linting, and builds on every push.*
 
-## 📚 List of Interfaces/Types Defined
+## List of Interfaces/Types Defined
 
 ### User
 ```typescript
@@ -196,11 +196,10 @@ enum SessionStatus {
 }
 ```
 
-## 🤖 AI-Use Disclosure
+## AI-Use Disclosure
 
 The UI, state management, and API client were built by the student. AI tools (like Gemini/ChatGPT) were used for generating boilerplate code, debugging test suites, and assisting with Tailwind CSS styling classes. The Gemini API is used in production to power the AI Review feature.
 
-## 👨‍💻 Author
+## Author
 
 **Jeric Lique** - ITELECT4 Student
-```
